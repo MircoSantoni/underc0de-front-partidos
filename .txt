@@ -1,0 +1,10 @@
+Hola, este es un test!!
+Recuerden que main es una rama protegida, nunca se comitea directamente a ella
+Lo que hay que hacer es crear una branch nueva que describa en que estamos trabajando!
+feature/branch
+Esto se llama gitflow, las ramas posibles son:
+feature/
+release/
+hotfix/
+bugfix/
+support/
