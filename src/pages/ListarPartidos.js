@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { FaMapPin } from "react-icons/fa";
+import { FaMapPin, FaTrashAlt, FaEdit } from "react-icons/fa";
 import ModificarPartidoModal from "../components/ModificarPartidoForm";
 import JugadoresForm from "../components/JugadoresForm";
 import ConfirmCancelModal from "../components/ConfirmCancelModal";
@@ -42,6 +42,7 @@ const ListadoPartidos = () => {
   const handleModificarClick = (partidoId) => {
     setModificarPartidoId(partidoId);
   };
+
 
   const closeModificarModal = () => {
     setModificarPartidoId(null);
@@ -152,6 +153,7 @@ const ListadoPartidos = () => {
                   >
                     Eliminar
                   </Button>
+
                 </td>
               </tr>
             ))}
@@ -162,6 +164,7 @@ const ListadoPartidos = () => {
       {modificarPartidoId && (
         <ModificarPartidoModal
           partido={partidos.find((p) => p.idPartido === modificarPartidoId)}
+
           isOpen={!!modificarPartidoId}
           onClose={closeModificarModal}
           onSuccess={handleRefreshPartidos}
