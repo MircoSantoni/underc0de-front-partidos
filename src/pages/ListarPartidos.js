@@ -3,7 +3,7 @@ import axios from "axios";
 import { FaMapPin, FaTrashAlt, FaEdit } from "react-icons/fa";
 import ModificarPartidoModal from "../components/ModificarPartidoForm";
 import JugadoresForm from "../components/JugadoresForm";
-import ConfirmCancelModal from "../components/ConfirmCancelModal";
+import ConfirmCancelModal from "../components/ui/ConfirmCancelModal";
 import { Button } from "../components/ui/Button";
 
 const ListadoPartidos = () => {
