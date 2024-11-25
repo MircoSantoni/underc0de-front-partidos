@@ -13,18 +13,19 @@ const JugadoresModal = ({ partido }) => {
   
   // Form state
   const [formData, setFormData] = useState({
-    Documento: '',
-    Nombre: '',
-    Apellido: '',
-    Telefono: '',
+    numDoc: '',
+    nombre: '',
+    apellido: '',
+    telefono: '',
     asistenciaAfter: false
   });
 
   const fetchJugadores = async () => {
     setLoading(true);
     setError(null);
+    console.log(partido.idPartido)
     try {
-      const response = await axios.get(`https://underc0departidos.up.railway.app/api/partidos/${partido.idPartido}/jugadores`);
+      const response = await axios.get(`https://underc0departidos.up.railway.app/api/jugadorPartido/${partido.idPartido}/jugadores`);
       setJugadores(response.data.jugadores || []);
     } catch (err) {
       setError('No se pudieron cargar los jugadores');
@@ -50,11 +51,15 @@ const JugadoresModal = ({ partido }) => {
     try {
       const registrationData = {
         idPartido: partido.idPartido,
-        ...formData
+        numDoc: formData.numDoc,
+        nombre: formData.nombre,
+        apellido: formData.apellido,
+        telefono: formData.telefono,
+        asistenciaAfter: formData.asistenciaAfter
       };
 
       const response = await axios.post(
-        'https://underc0departidos.up.railway.app/api/partidos/inscribir', 
+        'https://underc0departidos.up.railway.app/api/jugadorPartido/inscribir', 
         registrationData
       );
 
@@ -66,10 +71,10 @@ const JugadoresModal = ({ partido }) => {
         });
         // Reset form
         setFormData({
-          Documento: '',
-          Nombre: '',
-          Apellido: '',
-          Telefono: '',
+          numDoc: '',
+          nombre: '',
+          apellido: '',
+          telefono: '',
           asistenciaAfter: false
         });
       }
@@ -97,7 +102,7 @@ const JugadoresModal = ({ partido }) => {
         className="flex items-center text-xs sm:text-sm"
       >
         <FaUsers className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
-        {partido.jugadores_unidos ? partido.jugadores_unidos.length : 0} Jugadores
+Ver jugadores 
       </Button>
 
       {isModalOpen && (
@@ -129,7 +134,7 @@ const JugadoresModal = ({ partido }) => {
                       key={index} 
                       className="bg-gray-50 p-2 rounded-md"
                     >
-                      {jugador.nombre} {jugador.apellido}
+                      {jugador.nombre} {jugador.apellido} {"--"} {jugador.telefono}
                     </div>
                   ))}
                 </div>
@@ -150,13 +155,13 @@ const JugadoresModal = ({ partido }) => {
               )}
 
               <div>
-                <label htmlFor="Documento" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="numDoc" className="block text-sm font-medium text-gray-700 mb-1">
                   Documento
                 </label>
                 <Input
-                  id="Documento"
-                  name="Documento"
-                  value={formData.Documento}
+                  id="numDoc"
+                  name="numDoc"
+                  value={formData.numDoc}
                   onChange={handleInputChange}
                   required
                   placeholder="Ingrese su documento"
@@ -164,13 +169,13 @@ const JugadoresModal = ({ partido }) => {
               </div>
 
               <div>
-                <label htmlFor="Nombre" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">
                   Nombre
                 </label>
                 <Input
-                  id="Nombre"
-                  name="Nombre"
-                  value={formData.Nombre}
+                  id="nombre"
+                  name="nombre"
+                  value={formData.nombre}
                   onChange={handleInputChange}
                   required
                   placeholder="Ingrese su nombre"
@@ -178,13 +183,13 @@ const JugadoresModal = ({ partido }) => {
               </div>
 
               <div>
-                <label htmlFor="Apellido" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="apellido" className="block text-sm font-medium text-gray-700 mb-1">
                   Apellido
                 </label>
                 <Input
-                  id="Apellido"
-                  name="Apellido"
-                  value={formData.Apellido}
+                  id="apellido"
+                  name="apellido"
+                  value={formData.apellido}
                   onChange={handleInputChange}
                   required
                   placeholder="Ingrese su apellido"
@@ -192,14 +197,14 @@ const JugadoresModal = ({ partido }) => {
               </div>
 
               <div>
-                <label htmlFor="Telefono" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="telefono" className="block text-sm font-medium text-gray-700 mb-1">
                   Teléfono
                 </label>
                 <Input
-                  id="Telefono"
-                  name="Telefono"
+                  id="telefono"
+                  name="telefono"
                   type="tel"
-                  value={formData.Telefono}
+                  value={formData.telefono}
                   onChange={handleInputChange}
                   required
                   placeholder="Ingrese su teléfono"
