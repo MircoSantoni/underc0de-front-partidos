@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import CreatePartidoForm from '../components/CreatePartidoForm';
+
+
 
 // Componente Button simplificado
 const Button = ({ children, className, ...props }) => (
@@ -20,6 +23,7 @@ const Card = ({ children, className, ...props }) => (
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [mostrarCrearPartido, setMostrarCrearPartido] = useState(false);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -29,7 +33,10 @@ export default function Home() {
           <Card className="p-6">
             <h2 className="text-2xl font-semibold mb-4">Crear Partido</h2>
             <p className="mb-4">Organiza un nuevo partido de fútbol y gestiona los jugadores.</p>
-            <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+            <Button
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              onClick={() => setMostrarCrearPartido(true)}
+            >
               Crear Partido
             </Button>
           </Card>
@@ -42,6 +49,20 @@ export default function Home() {
           </Card>
         </div>
       </main>
+
+      {mostrarCrearPartido && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75"
+          onClick={() => setMostrarCrearPartido(false)}  // Cerrar el modal al hacer clic fuera
+        >
+          <div
+            className="bg-white rounded-lg p-8 shadow-lg w-full max-w-md"
+            onClick={(e) => e.stopPropagation()} // Evita que el clic en el formulario cierre el modal
+          >
+            <CreatePartidoForm onClose={() => setMostrarCrearPartido(false)} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

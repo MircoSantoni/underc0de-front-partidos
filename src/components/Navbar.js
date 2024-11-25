@@ -12,8 +12,8 @@ export default function Navbar() {
           <span className="text-xl font-bold">UNDERC0DE</span>
         </div>
         <div className="hidden md:flex space-x-4">
-          <Link to="/ver-partidos" className="hover:text-gray-300">Ver Partidos</Link>
-          <Link to="/preferencias" className="hover:text-gray-300">Preferencias</Link>
+          <Link to="/home" className="hover:text-gray-300">Home</Link>
+          <Link to="/listar-partidos" className="hover:text-gray-300">Ver Partidos</Link>
           <Link to="/login" className="hover:text-gray-300">Iniciar Sesión</Link>
         </div>
         <div className="md:hidden">
@@ -32,7 +32,7 @@ export default function Navbar() {
       </div>
       {isMenuOpen && (
         <div className="mt-2 md:hidden">
-          <Link to="/ver-partidos" className="block py-2 hover:text-gray-300">Ver Partidos</Link>
+          <Link to="/listar-partidos" className="block py-2 hover:text-gray-300">Ver Partidos</Link>
           <Link to="/preferencias" className="block py-2 hover:text-gray-300">Preferencias</Link>
         </div>
       )}
