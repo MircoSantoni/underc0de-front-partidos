@@ -6,7 +6,6 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
 import ListarPartidos from './pages/ListarPartidos';
-import ModificarPartido from './pages/ModificarPartido';
 
 function App() {
   return (
@@ -16,7 +15,6 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/home" element={<Home />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/modificar-partido" element={<ModificarPartido />} />
         <Route path="/listar-partidos" element={<ListarPartidos />} />
       </Routes>
       <Footer />

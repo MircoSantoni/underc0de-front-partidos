@@ -41,7 +41,7 @@ export default function Home() {
             </Button>
           </Card>
           <Card className="p-6">
-            <h2 className="text-2xl font-semibold mb-4">Unirse a Partido</h2>
+            <h2 className="text-2xl font-semibold mb-4">Modificar un partido</h2>
             <p className="mb-4">Únete a un partido existente y registra tu participación.</p>
             <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
               Unirse a Partido
