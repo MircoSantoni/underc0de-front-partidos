@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+
 import ListarPartidos from './pages/ListarPartidos';
 import ModificarPartido from './pages/ModificarPartido';
 
