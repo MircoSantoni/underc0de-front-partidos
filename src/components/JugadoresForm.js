@@ -4,12 +4,59 @@ import { Button } from './ui/Button';
 import { Input } from './ui/Input';
 import axios from 'axios';
 
+const validateFormData = (formData) => {
+  const errors = {};
+
+  if (!formData.numDoc) {
+    errors.numDoc = 'El documento es requerido';
+  } else if (!/^\d+$/.test(formData.numDoc)) {
+    errors.numDoc = 'El documento debe contener solo números';
+  }
+
+  if (!formData.nombre) {
+    errors.nombre = 'El nombre es requerido';
+  } else if (formData.nombre.length < 2) {
+    errors.nombre = 'El nombre debe tener al menos 2 caracteres';
+  }
+
+  if (!formData.apellido) {
+    errors.apellido = 'El apellido es requerido';
+  } else if (formData.apellido.length < 2) {
+    errors.apellido = 'El apellido debe tener al menos 2 caracteres';
+  }
+
+  if (!formData.telefono) {
+    errors.telefono = 'El teléfono es requerido';
+  } else if (!/^\d{9,12}$/.test(formData.telefono)) {
+    errors.telefono = 'Ingrese un número de teléfono válido';
+  }
+
+  return errors;
+};
+
+const prepareRegistrationData = (partido, players) => {
+  return {
+    title: "Partido Futbol",
+    quantity: players.length,
+    price: partido.precio || 0,
+    jugadores: players.map(player => ({
+      numDoc: player.numDoc,
+      nombre: player.nombre,
+      apellido: player.apellido,
+      telefono: player.telefono,
+      asistenciaAfter: player.asistenciaAfter || false
+    })),
+    idPartido: partido.idPartido
+  };
+};
+
 const JugadoresModal = ({ partido }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [jugadores, setJugadores] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [message, setMessage] = useState({ text: '', type: '' });
+  const [formErrors, setFormErrors] = useState({});
   
   // Form state
   const [formData, setFormData] = useState({
@@ -23,7 +70,6 @@ const JugadoresModal = ({ partido }) => {
   const fetchJugadores = async () => {
     setLoading(true);
     setError(null);
-    console.log(partido.idPartido)
     try {
       const response = await axios.get(`https://underc0departidos.up.railway.app/api/jugadorPartido/${partido.idPartido}/jugadores`);
       setJugadores(response.data.jugadores || []);
@@ -34,41 +80,63 @@ const JugadoresModal = ({ partido }) => {
       setLoading(false);
     }
   };
+  
+
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value
     }));
+
+    if (formErrors[name]) {
+      setFormErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
   };
 
   const handleJoinPartido = async (e) => {
     e.preventDefault();
+    
+    // Validate form data
+    const validationErrors = validateFormData(formData);
+    
+    if (Object.keys(validationErrors).length > 0) {
+      setFormErrors(validationErrors);
+      return;
+    }
+
     setLoading(true);
     setMessage({ text: '', type: '' });
 
     try {
-      const registrationData = {
-        idPartido: partido.idPartido,
-        numDoc: formData.numDoc,
-        nombre: formData.nombre,
-        apellido: formData.apellido,
-        telefono: formData.telefono,
-        asistenciaAfter: formData.asistenciaAfter
-      };
+      // Prepare registration data using helper function
+      const registrationData = prepareRegistrationData(partido, [formData]);
+      console.log(registrationData)
 
       const response = await axios.post(
-        'https://underc0departidos.up.railway.app/api/jugadorPartido/inscribir', 
+        'https://underc0departidos.up.railway.app/api/create_preference', 
         registrationData
       );
 
       if (response.status === 200) {
-        fetchJugadores(); // Refresh players list
+
+        if (response.data.url) {
+          window.location.href = response.data.url;
+          fetchJugadores();
+        } else {
+          console.error("No se recibió una URL en la respuesta");
+        }        fetchJugadores(); // Refresh players list
         setMessage({ 
           text: response.data.message || 'Te has unido al partido', 
-          type: 'success' 
+          type: 'success' ,
+          
         });
+        
         // Reset form
         setFormData({
           numDoc: '',
@@ -77,6 +145,7 @@ const JugadoresModal = ({ partido }) => {
           telefono: '',
           asistenciaAfter: false
         });
+        setFormErrors({});
       }
     } catch (error) {
       console.error('Error al unirse al partido:', error);
@@ -102,7 +171,7 @@ const JugadoresModal = ({ partido }) => {
         className="flex items-center text-xs sm:text-sm"
       >
         <FaUsers className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
-Ver jugadores 
+        Ver jugadores 
       </Button>
 
       {isModalOpen && (
@@ -154,6 +223,7 @@ Ver jugadores
                 </p>
               )}
 
+              {/* Documento Input */}
               <div>
                 <label htmlFor="numDoc" className="block text-sm font-medium text-gray-700 mb-1">
                   Documento
@@ -166,8 +236,12 @@ Ver jugadores
                   required
                   placeholder="Ingrese su documento"
                 />
+                {formErrors.numDoc && (
+                  <p className="text-red-500 text-xs mt-1">{formErrors.numDoc}</p>
+                )}
               </div>
 
+              {/* Nombre Input */}
               <div>
                 <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">
                   Nombre
@@ -180,8 +254,12 @@ Ver jugadores
                   required
                   placeholder="Ingrese su nombre"
                 />
+                {formErrors.nombre && (
+                  <p className="text-red-500 text-xs mt-1">{formErrors.nombre}</p>
+                )}
               </div>
 
+              {/* Apellido Input */}
               <div>
                 <label htmlFor="apellido" className="block text-sm font-medium text-gray-700 mb-1">
                   Apellido
@@ -194,8 +272,12 @@ Ver jugadores
                   required
                   placeholder="Ingrese su apellido"
                 />
+                {formErrors.apellido && (
+                  <p className="text-red-500 text-xs mt-1">{formErrors.apellido}</p>
+                )}
               </div>
 
+              {/* Teléfono Input */}
               <div>
                 <label htmlFor="telefono" className="block text-sm font-medium text-gray-700 mb-1">
                   Teléfono
@@ -209,18 +291,19 @@ Ver jugadores
                   required
                   placeholder="Ingrese su teléfono"
                 />
+                {formErrors.telefono && (
+                  <p className="text-red-500 text-xs mt-1">{formErrors.telefono}</p>
+                )}
               </div>
 
+              {/* Asistencia Checkbox */}
               <div className="flex items-center">
                 <input
                   type="checkbox"
                   id="asistenciaAfter"
                   name="asistenciaAfter"
                   checked={formData.asistenciaAfter}
-                  onChange={(e) => setFormData(prev => ({
-                    ...prev,
-                    asistenciaAfter: e.target.checked
-                  }))}
+                  onChange={handleInputChange}
                   className="mr-2"
                 />
                 <label htmlFor="asistenciaAfter" className="text-sm text-gray-700">
@@ -228,6 +311,7 @@ Ver jugadores
                 </label>
               </div>
 
+              {/* Submit Button */}
               <Button 
                 type="submit" 
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white" 
