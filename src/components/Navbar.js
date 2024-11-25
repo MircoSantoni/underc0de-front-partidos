@@ -12,8 +12,9 @@ export default function Navbar() {
           <span className="text-xl font-bold">UNDERC0DE</span>
         </div>
         <div className="hidden md:flex space-x-4">
+          <Link to="/home" className="hover:text-gray-300">Home</Link>
           <Link to="/listar-partidos" className="hover:text-gray-300">Ver Partidos</Link>
-          <Link to="/preferencias" className="hover:text-gray-300">Preferencias</Link>
+          <Link to="/login" className="hover:text-gray-300">Iniciar Sesión</Link>
         </div>
         <div className="md:hidden">
           <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white focus:outline-none">
