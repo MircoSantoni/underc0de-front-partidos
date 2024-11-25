@@ -1,3 +1,4 @@
+/* Estilo general del body */
 body {
     margin: 0;
     font-family: Arial, sans-serif;
@@ -5,6 +6,7 @@ body {
     color: #333;
   }
   
+  /* Contenedor de la página de login */
   .login-page {
     min-height: 100vh;
     display: flex;
@@ -12,15 +14,17 @@ body {
     justify-content: space-between;
   }
   
+  /* Contenedor central del formulario */
   .login-container {
     display: flex;
     justify-content: center;
-    align-items: flex-start; 
+    align-items: flex-start;
     flex-grow: 1;
-    padding-top: 10rem; 
-    padding-bottom: 2rem; 
+    padding-top: 6rem; /* Menos espacio superior */
+    padding-bottom: 2rem;
   }
   
+  /* Estilo del formulario */
   .login-card {
     background-color: #ffffff;
     padding: 1.5rem;
@@ -28,25 +32,29 @@ body {
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     text-align: center;
     width: 100%;
-    max-width: 400px;
+    max-width: 400px; /* Tamaño máximo */
   }
   
+  /* Estilo del título */
   h2 {
     margin-bottom: 1.5rem;
     color: #333;
   }
   
+  /* Estilo de los grupos de formularios */
   .form-group {
     margin-bottom: 1rem;
     text-align: left;
   }
   
+  /* Estilo de las etiquetas */
   label {
     display: block;
     margin-bottom: 0.5rem;
     color: #555;
   }
   
+  /* Estilo de los campos de texto */
   input {
     width: 100%;
     padding: 0.5rem;
@@ -62,6 +70,7 @@ body {
     border-color: #6200ea;
   }
   
+  /* Estilo del botón */
   button {
     margin-top: 1rem;
     padding: 0.7rem 1.5rem;
@@ -78,9 +87,75 @@ body {
     background-color: #3700b3;
   }
   
+  /* Estilo de los mensajes de error */
   .message {
     margin-top: 1rem;
     font-size: 0.9rem;
     color: #d32f2f;
+  }
+  
+  /* Media Queries para responsividad */
+  
+  /* Pantallas pequeñas (móviles) */
+  @media (max-width: 480px) {
+    .login-container {
+      padding-top: 4rem; /* Ajusta el espacio superior en pantallas pequeñas */
+    }
+  
+    .login-card {
+      padding: 1rem;
+      max-width: 90%; /* Ajusta el tamaño máximo para pantallas más pequeñas */
+    }
+  
+    h2 {
+      margin-bottom: 1.2rem;
+      font-size: 1.2rem; /* Hacer el título más pequeño */
+    }
+  
+    input {
+      padding: 0.4rem; /* Reducir el padding de los inputs */
+      font-size: 0.9rem; /* Reducir el tamaño de fuente */
+    }
+  
+    button {
+      padding: 0.6rem 1.2rem; /* Botón un poco más pequeño */
+      font-size: 0.9rem; /* Reducir el tamaño de la fuente */
+    }
+  }
+  
+  /* Pantallas medianas (tabletas) */
+  @media (max-width: 768px) {
+    .login-container {
+      padding-top: 5rem; /* Ajustar margen superior en tabletas */
+    }
+  
+    .login-card {
+      padding: 1.2rem; /* Ajustar padding en tabletas */
+    }
+  
+    h2 {
+      margin-bottom: 1.4rem;
+      font-size: 1.3rem; /* Título un poco más pequeño */
+    }
+  
+    input {
+      font-size: 1rem; /* Mantener tamaño de fuente adecuado */
+    }
+  
+    button {
+      font-size: 1rem; /* Mantener tamaño de fuente adecuado */
+    }
+  }
+  
+  /* Pantallas grandes (escritorios) */
+  @media (min-width: 1024px) {
+    .login-container {
+      padding-top: 6rem; /* Mantener el padding superior en pantallas grandes */
+    }
+  
+    .login-card {
+      padding: 1.5rem;
+      max-width: 400px; /* Mantener el tamaño máximo del formulario */
+    }
   }
   
