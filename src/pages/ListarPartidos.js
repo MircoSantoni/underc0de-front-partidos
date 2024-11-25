@@ -3,6 +3,7 @@ import axios from "axios";
 import { FaMapPin, FaTrashAlt, FaEdit } from "react-icons/fa";
 import ModificarPartidoModal from "../components/ModificarPartidoForm";
 import JugadoresForm from "../components/JugadoresForm";
+import ConfirmCancelModal from "../components/ConfirmCancelModal";
 import { Button } from "../components/ui/Button";
 
 const ListadoPartidos = () => {
@@ -11,17 +12,18 @@ const ListadoPartidos = () => {
   const [error, setError] = useState(null);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [modificarPartidoId, setModificarPartidoId] = useState(null);
+  const [deletePartidoId, setDeletePartidoId] = useState(null);
 
   useEffect(() => {
     const fetchPartidos = async () => {
       try {
-        const token = localStorage.getItem('jwt');
+        const token = localStorage.getItem("jwt");
         const response = await axios.get(
           "https://underc0departidos.up.railway.app/api/partido/obtener",
           {
             headers: {
-              'Authorization': `Bearer ${token}`
-            }
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
         setPartidos(response.data.partidos);
@@ -49,13 +51,13 @@ const ListadoPartidos = () => {
   const handleRefreshPartidos = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('jwt');
+      const token = localStorage.getItem("jwt");
       const response = await axios.get(
         "https://underc0departidos.up.railway.app/api/partido/obtener",
         {
           headers: {
-            'Authorization': `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       setPartidos(response.data.partidos);
@@ -65,6 +67,30 @@ const ListadoPartidos = () => {
       console.error("Error:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteClick = (partidoId) => {
+    setDeletePartidoId(partidoId);
+  };
+
+  const confirmDeletePartido = async () => {
+    try {
+      const token = localStorage.getItem("jwt");
+      await axios.delete(
+        `https://underc0departidos.up.railway.app/api/partido/eliminar/${deletePartidoId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setPartidos((prev) =>
+        prev.filter((partido) => partido.idPartido !== deletePartidoId)
+      );
+      setDeletePartidoId(null);
+    } catch (err) {
+      console.error("Error al eliminar el partido:", err);
     }
   };
 
@@ -114,24 +140,20 @@ const ListadoPartidos = () => {
                     onToggle={() => setOpenDropdown(openDropdown === partido.idPartido ? null : partido.idPartido)}
                   />
                 </td>
-                <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm">
-                  <div className="flex space-x-2 items-center">
-                    <Button
-                      onClick={() => handleModificarClick(partido.idPartido)}
-                      className="flex items-center text-xs sm:text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg p-2"
-                    >
-                      <FaEdit className="mr-1 h-4 w-4" />
-                      Modificar
-                    </Button>
+                <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm space-x-2">
+                  <Button
+                    onClick={() => handleModificarClick(partido.idPartido)}
+                    className="flex items-center text-xs sm:text-sm bg-yellow-500 hover:bg-yellow-600"
+                  >
+                    Modificar
+                  </Button>
+                  <Button
+                    onClick={() => handleDeleteClick(partido.idPartido)}
+                    className="flex items-center text-xs sm:text-sm bg-red-500 hover:bg-red-600"
+                  >
+                    Eliminar
+                  </Button>
 
-                    <Button
-                      onClick={() => handleEliminarPartido(partido.partidoId)}
-                      className="flex items-center text-xs sm:text-sm bg-red-500 hover:bg-red-600 text-white rounded-lg p-2"
-                    >
-                      <FaTrashAlt className="mr-1 h-4 w-4" />
-                      Eliminar
-                    </Button>
-                  </div>
                 </td>
               </tr>
             ))}
@@ -139,15 +161,21 @@ const ListadoPartidos = () => {
         </table>
       </div>
 
-      {/* Modificar Partido Modal */}
       {modificarPartidoId && (
         <ModificarPartidoModal
-          partido={partidos.find(p => p.idPartido === modificarPartidoId)}
+          partido={partidos.find((p) => p.idPartido === modificarPartidoId)}
+
           isOpen={!!modificarPartidoId}
           onClose={closeModificarModal}
           onSuccess={handleRefreshPartidos}
         />
       )}
+
+      <ConfirmCancelModal
+        show={!!deletePartidoId}
+        onCancel={() => setDeletePartidoId(null)}
+        onConfirm={confirmDeletePartido}
+      />
     </div>
   );
 };
