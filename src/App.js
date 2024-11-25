@@ -5,7 +5,6 @@ import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
-=======
 import ModificarPartido from './pages/ModificarPartido';
 function App() {
   return (
