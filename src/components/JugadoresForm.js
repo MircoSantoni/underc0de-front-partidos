@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaUsers, FaSpinner, FaTimes } from 'react-icons/fa';
+import { FaUsers, FaSpinner, FaTimes, FaPlus, FaTrash } from 'react-icons/fa';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
 import axios from 'axios';
@@ -34,22 +34,6 @@ const validateFormData = (formData) => {
   return errors;
 };
 
-const prepareRegistrationData = (partido, players) => {
-  return {
-    title: "Partido Futbol",
-    quantity: players.length,
-    price: partido.precio || 0,
-    jugadores: players.map(player => ({
-      numDoc: player.numDoc,
-      nombre: player.nombre,
-      apellido: player.apellido,
-      telefono: player.telefono,
-      asistenciaAfter: player.asistenciaAfter || false
-    })),
-    idPartido: partido.idPartido
-  };
-};
-
 const JugadoresModal = ({ partido }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [jugadores, setJugadores] = useState([]);
@@ -58,7 +42,7 @@ const JugadoresModal = ({ partido }) => {
   const [message, setMessage] = useState({ text: '', type: '' });
   const [formErrors, setFormErrors] = useState({});
   
-  // Form state
+  // Form state for adding new players
   const [formData, setFormData] = useState({
     numDoc: '',
     nombre: '',
@@ -67,21 +51,7 @@ const JugadoresModal = ({ partido }) => {
     asistenciaAfter: false
   });
 
-  const fetchJugadores = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await axios.get(`https://underc0departidos.up.railway.app/api/jugadorPartido/${partido.idPartido}/jugadores`);
-      setJugadores(response.data.jugadores || []);
-    } catch (err) {
-      setError('No se pudieron cargar los jugadores');
-      console.error('Error fetching jugadores:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-  
-
+  const [selectedPlayers, setSelectedPlayers] = useState([]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -99,10 +69,7 @@ const JugadoresModal = ({ partido }) => {
     }
   };
 
-  const handleJoinPartido = async (e) => {
-    e.preventDefault();
-    
-    // Validate form data
+  const addPlayerToList = () => {
     const validationErrors = validateFormData(formData);
     
     if (Object.keys(validationErrors).length > 0) {
@@ -110,42 +77,74 @@ const JugadoresModal = ({ partido }) => {
       return;
     }
 
+    // Check if player is already added
+    const isDuplicate = selectedPlayers.some(
+      player => player.numDoc === formData.numDoc
+    );
+
+    if (isDuplicate) {
+      setMessage({ 
+        text: 'Este jugador ya ha sido añadido', 
+        type: 'error' 
+      });
+      return;
+    }
+
+    // Add player to selected players
+    setSelectedPlayers([...selectedPlayers, formData]);
+
+    // Reset form
+    setFormData({
+      numDoc: '',
+      nombre: '',
+      apellido: '',
+      telefono: '',
+      asistenciaAfter: false
+    });
+    setFormErrors({});
+    setMessage({ text: '', type: '' });
+  };
+
+  const removePlayer = (numDoc) => {
+    setSelectedPlayers(selectedPlayers.filter(player => player.numDoc !== numDoc));
+  };
+
+  const handlePayForAllPlayers = async () => {
+    if (selectedPlayers.length === 0) {
+      setMessage({ 
+        text: 'Debe añadir al menos un jugador', 
+        type: 'error' 
+      });
+      return;
+    }
+
     setLoading(true);
     setMessage({ text: '', type: '' });
 
     try {
-      // Prepare registration data using helper function
-      const registrationData = prepareRegistrationData(partido, [formData]);
-      console.log(registrationData)
+      const registrationData = {
+        title: "Partido Futbol",
+        quantity: selectedPlayers.length,
+        price: partido.precio || 0,
+        jugadores: selectedPlayers.map(player => ({
+          numDoc: player.numDoc,
+          nombre: player.nombre,
+          apellido: player.apellido,
+          telefono: player.telefono,
+          asistenciaAfter: player.asistenciaAfter || false
+        })),
+        idPartido: partido.idPartido
+      };
 
       const response = await axios.post(
         'https://underc0departidos.up.railway.app/api/create_preference', 
         registrationData
       );
 
-      if (response.status === 200) {
-
-        if (response.data.url) {
-          window.location.href = response.data.url;
-          fetchJugadores();
-        } else {
-          console.error("No se recibió una URL en la respuesta");
-        }        fetchJugadores(); // Refresh players list
-        setMessage({ 
-          text: response.data.message || 'Te has unido al partido', 
-          type: 'success' ,
-          
-        });
-        
-        // Reset form
-        setFormData({
-          numDoc: '',
-          nombre: '',
-          apellido: '',
-          telefono: '',
-          asistenciaAfter: false
-        });
-        setFormErrors({});
+      if (response.status === 200 && response.data.url) {
+        window.location.href = response.data.url;
+      } else {
+        throw new Error("No se recibió una URL de pago");
       }
     } catch (error) {
       console.error('Error al unirse al partido:', error);
@@ -158,12 +157,6 @@ const JugadoresModal = ({ partido }) => {
     }
   };
 
-  useEffect(() => {
-    if (isModalOpen) {
-      fetchJugadores();
-    }
-  }, [isModalOpen]);
-
   return (
     <>
       <Button 
@@ -171,7 +164,7 @@ const JugadoresModal = ({ partido }) => {
         className="flex items-center text-xs sm:text-sm"
       >
         <FaUsers className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
-        Ver jugadores 
+        Añadir Jugadores
       </Button>
 
       {isModalOpen && (
@@ -184,46 +177,16 @@ const JugadoresModal = ({ partido }) => {
               <FaTimes className="h-6 w-6" />
             </button>
 
-            <h2 className="text-xl font-semibold mb-4">Jugadores del Partido</h2>
+            <h2 className="text-xl font-semibold mb-4">Añadir Jugadores al Partido</h2>
 
-            {/* Jugadores List Section */}
-            <div className="mb-6">
-              <h3 className="text-lg font-medium mb-2">Lista de Jugadores</h3>
-              {loading ? (
-                <div className="flex justify-center items-center text-blue-600">
-                  <FaSpinner className="animate-spin mr-2" />
-                  Cargando jugadores...
-                </div>
-              ) : error ? (
-                <p className="text-red-500">{error}</p>
-              ) : jugadores.length > 0 ? (
-                <div className="space-y-2 max-h-40 overflow-y-auto border rounded-md p-2">
-                  {jugadores.map((jugador, index) => (
-                    <div 
-                      key={index} 
-                      className="bg-gray-50 p-2 rounded-md"
-                    >
-                      {jugador.nombre} {jugador.apellido} {"--"} {jugador.telefono}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-500 text-center">No hay jugadores inscritos</p>
-              )}
-              <p className="text-sm text-gray-600 mt-2">
-                {jugadores.length} / {partido.limite_jugadores} jugadores
+            {message.text && (
+              <p className={`mb-4 text-sm ${message.type === 'error' ? 'text-red-500' : 'text-green-500'}`}>
+                {message.text}
               </p>
-            </div>
+            )}
 
-            {/* Inscription Form */}
-            <form onSubmit={handleJoinPartido} className="space-y-4">
-              {message.text && (
-                <p className={`text-sm ${message.type === 'error' ? 'text-red-500' : 'text-green-500'}`}>
-                  {message.text}
-                </p>
-              )}
-
-              {/* Documento Input */}
+            {/* Formulario para añadir jugador */}
+            <div className="space-y-4 mb-6">
               <div>
                 <label htmlFor="numDoc" className="block text-sm font-medium text-gray-700 mb-1">
                   Documento
@@ -233,7 +196,6 @@ const JugadoresModal = ({ partido }) => {
                   name="numDoc"
                   value={formData.numDoc}
                   onChange={handleInputChange}
-                  required
                   placeholder="Ingrese su documento"
                 />
                 {formErrors.numDoc && (
@@ -241,7 +203,6 @@ const JugadoresModal = ({ partido }) => {
                 )}
               </div>
 
-              {/* Nombre Input */}
               <div>
                 <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">
                   Nombre
@@ -251,7 +212,6 @@ const JugadoresModal = ({ partido }) => {
                   name="nombre"
                   value={formData.nombre}
                   onChange={handleInputChange}
-                  required
                   placeholder="Ingrese su nombre"
                 />
                 {formErrors.nombre && (
@@ -259,7 +219,6 @@ const JugadoresModal = ({ partido }) => {
                 )}
               </div>
 
-              {/* Apellido Input */}
               <div>
                 <label htmlFor="apellido" className="block text-sm font-medium text-gray-700 mb-1">
                   Apellido
@@ -269,7 +228,6 @@ const JugadoresModal = ({ partido }) => {
                   name="apellido"
                   value={formData.apellido}
                   onChange={handleInputChange}
-                  required
                   placeholder="Ingrese su apellido"
                 />
                 {formErrors.apellido && (
@@ -277,7 +235,6 @@ const JugadoresModal = ({ partido }) => {
                 )}
               </div>
 
-              {/* Teléfono Input */}
               <div>
                 <label htmlFor="telefono" className="block text-sm font-medium text-gray-700 mb-1">
                   Teléfono
@@ -288,7 +245,6 @@ const JugadoresModal = ({ partido }) => {
                   type="tel"
                   value={formData.telefono}
                   onChange={handleInputChange}
-                  required
                   placeholder="Ingrese su teléfono"
                 />
                 {formErrors.telefono && (
@@ -296,7 +252,6 @@ const JugadoresModal = ({ partido }) => {
                 )}
               </div>
 
-              {/* Asistencia Checkbox */}
               <div className="flex items-center">
                 <input
                   type="checkbox"
@@ -311,15 +266,53 @@ const JugadoresModal = ({ partido }) => {
                 </label>
               </div>
 
-              {/* Submit Button */}
               <Button 
-                type="submit" 
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white" 
-                disabled={loading || jugadores.length >= partido.limite_jugadores}
+                onClick={addPlayerToList}
+                className="w-full bg-green-600 hover:bg-green-700 text-white flex items-center justify-center"
               >
-                {loading ? 'Inscribiendo...' : 'Unirme al Partido'}
+                <FaPlus className="mr-2" /> Añadir Jugador
               </Button>
-            </form>
+            </div>
+
+            {/* Lista de jugadores seleccionados */}
+            {selectedPlayers.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-lg font-medium mb-2">Jugadores Añadidos</h3>
+                <div className="space-y-2 max-h-40 overflow-y-auto border rounded-md p-2">
+                  {selectedPlayers.map((player, index) => (
+                    <div 
+                      key={index} 
+                      className="bg-gray-50 p-2 rounded-md flex justify-between items-center"
+                    >
+                      <span>
+                        {player.nombre} {player.apellido} -- {player.telefono}
+                      </span>
+                      <button 
+                        onClick={() => removePlayer(player.numDoc)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-sm text-gray-600 mt-2">
+                  {selectedPlayers.length} jugador(es) añadidos
+                </p>
+              </div>
+            )}
+
+            {/* Botón de pago */}
+            <Button 
+              onClick={handlePayForAllPlayers}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              disabled={loading || selectedPlayers.length === 0}
+            >
+              {loading 
+                ? 'Procesando...' 
+                : `Pagar por ${selectedPlayers.length} jugador(es)`
+              }
+            </Button>
           </div>
         </div>
       )}

@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import CreatePartidoForm from '../components/CreatePartidoForm';
-
-
 
 // Componente Button simplificado
 const Button = ({ children, className, ...props }) => (
@@ -24,6 +22,7 @@ const Card = ({ children, className, ...props }) => (
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [mostrarCrearPartido, setMostrarCrearPartido] = useState(false);
+  const navigate = useNavigate(); // Hook para navegar
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -41,9 +40,12 @@ export default function Home() {
             </Button>
           </Card>
           <Card className="p-6">
-            <h2 className="text-2xl font-semibold mb-4">Modificar un partido</h2>
+            <h2 className="text-2xl font-semibold mb-4">Únete a un partido</h2>
             <p className="mb-4">Únete a un partido existente y registra tu participación.</p>
-            <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
+            <Button
+              className="w-full bg-green-600 hover:bg-green-700 text-white"
+              onClick={() => navigate('/listar-partidos')} 
+            >
               Unirse a Partido
             </Button>
           </Card>
@@ -53,7 +55,7 @@ export default function Home() {
       {mostrarCrearPartido && (
         <div
           className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75"
-          onClick={() => setMostrarCrearPartido(false)}  // Cerrar el modal al hacer clic fuera
+          onClick={() => setMostrarCrearPartido(false)} // Cerrar el modal al hacer clic fuera
         >
           <div
             className="bg-white rounded-lg p-8 shadow-lg w-full max-w-md"

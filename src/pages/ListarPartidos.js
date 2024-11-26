@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { FaMapPin, FaTrashAlt, FaEdit } from "react-icons/fa";
+import { FaMapPin } from "react-icons/fa";
 import ModificarPartidoModal from "../components/ModificarPartidoForm";
 import JugadoresForm from "../components/JugadoresForm";
 import ConfirmCancelModal from "../components/ui/ConfirmCancelModal";
@@ -43,7 +43,6 @@ const ListadoPartidos = () => {
     setModificarPartidoId(partidoId);
   };
 
-
   const closeModificarModal = () => {
     setModificarPartidoId(null);
   };
@@ -71,22 +70,26 @@ const ListadoPartidos = () => {
   };
 
   const handleDeleteClick = (partidoId) => {
+    console.log("Intentando eliminar partido con ID:", partidoId);
     setDeletePartidoId(partidoId);
   };
 
-  const confirmDeletePartido = async () => {
+  const confirmDeletePartido = async (partidoId) => {
     try {
       const token = localStorage.getItem("jwt");
-      await axios.delete(
-        `https://underc0departidos.up.railway.app/api/partido/eliminar/${deletePartidoId}`,
+      console.log("Eliminando partido con ID:", partidoId);
+      await axios.get(
+        `https://underc0departidos.up.railway.app/api/partido/eliminar/${partidoId}`,
+        
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+
           },
         }
-      );
+      );  
       setPartidos((prev) =>
-        prev.filter((partido) => partido.idPartido !== deletePartidoId)
+        prev.filter((partido) => partido.idPartido !== partidoId)
       );
       setDeletePartidoId(null);
     } catch (err) {
@@ -153,7 +156,6 @@ const ListadoPartidos = () => {
                   >
                     Eliminar
                   </Button>
-
                 </td>
               </tr>
             ))}
@@ -164,7 +166,6 @@ const ListadoPartidos = () => {
       {modificarPartidoId && (
         <ModificarPartidoModal
           partido={partidos.find((p) => p.idPartido === modificarPartidoId)}
-
           isOpen={!!modificarPartidoId}
           onClose={closeModificarModal}
           onSuccess={handleRefreshPartidos}
@@ -174,7 +175,7 @@ const ListadoPartidos = () => {
       <ConfirmCancelModal
         show={!!deletePartidoId}
         onCancel={() => setDeletePartidoId(null)}
-        onConfirm={confirmDeletePartido}
+        onConfirm={() => confirmDeletePartido(deletePartidoId)}
       />
     </div>
   );

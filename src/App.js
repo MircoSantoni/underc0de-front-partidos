@@ -1,27 +1,39 @@
 import './App.css';
 import Home from './pages/Home';
 import Login from './pages/Login';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-// import ListarPartidos from './components/ListarPartidos';
 import ListarPartidosEstado from './components/ListarPartidosEstado';
-import NavbarAdmin from './components/NavbarAdmin';
-
 import ListarPartidos from './pages/ListarPartidos';
+import ProtectedRoute from './components/ProtectedRoute'; // Crea este componente
+import AdminDashboard from './pages/AdminDashboard'; // Crea este componente
+
 
 function App() {
   return (
     <div>
       <Navbar />
       <Routes>
-      <Route path="/admin" element={<NavbarAdmin/>}></Route>
+        {/* Rutas públicas */}
         <Route path="/home" element={<Home/>}></Route>
+        <Route path="/" element={<Home/>}></Route>
+        <Route path="/login" element={<Login />}></Route>
         <Route path="/listar-partidos" element={<ListarPartidos />} />
         <Route path="/listar-partidos-estado" element={<ListarPartidosEstado />} />
-        <Route path="/listar-partidos" element={<ListarPartidos />} /> 
-        <Route path="/listar-partidos-por-estado" element={<ListarPartidosEstado/>} />
+        
 
+        <Route 
+          path="/admin" 
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Redirección por defecto */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <Footer />
     </div>
