@@ -1,10 +1,20 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 export default function NavbarAdmin() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isPartidosMenuOpen, setIsPartidosMenuOpen] = useState(false);
-  const [isJugadoresMenuOpen, setIsJugadoresMenuOpen] = useState(false);
+  const navigate = useNavigate();
+
+  // Logout handler function
+  const handleLogout = () => {
+    // Remove the authentication token from cookies
+    Cookies.remove('authToken');
+    
+    // Redirect to login page
+    navigate('/login');
+  };
 
   return (
     <nav className="bg-gray-900 text-white p-6 lg:px-12 md:px-6">
@@ -13,7 +23,8 @@ export default function NavbarAdmin() {
           <img src="/underc0delogo.png" alt="UNDERCODE Logo" className="h-8 w-auto" />
           <span className="text-xl font-bold">ADMIN</span>
         </div>
-        <div className="hidden md:flex space-x-4">
+        <div className="hidden md:flex space-x-4 items-center">
+          {/* Partidos dropdown */}
           <div className="relative">
             <button
               onClick={() => setIsPartidosMenuOpen(!isPartidosMenuOpen)}
@@ -23,27 +34,20 @@ export default function NavbarAdmin() {
             </button>
             {isPartidosMenuOpen && (
               <div className="absolute bg-gray-800 text-white rounded-md shadow-lg mt-2">
-                <Link to="/crear-partido" className="block px-4 py-2 hover:bg-gray-700">Crear Partido</Link>
-                <Link to="/listar-partidos" className="block px-4 py-2 hover:bg-gray-700">Ver Partidos</Link>
-                <Link to="/listar-partidos-por-estado" className="block hover:text-gray-300">Ver Partidos por Estado</Link>
+                <Link to="/homeAdmin" className="block hover:text-gray-300 px-4 py-2">Home</Link>
+                <Link to="/listar-partidos" className="block hover:text-gray-300 px-4 py-2">Ver Partidos</Link>
+                <Link to="/admin-dashboard" className="block hover:text-gray-300 px-4 py-2">Dashboard</Link>
               </div>
             )}
           </div>
-          <div className="relative">
-            <button
-              onClick={() => setIsJugadoresMenuOpen(!isJugadoresMenuOpen)}
-              className="hover:text-gray-300"
-            >
-              Jugadores
-            </button>
-            {isJugadoresMenuOpen && (
-              <div className="absolute bg-gray-800 text-white rounded-md shadow-lg mt-2">
-                <Link to="/registrar-jugador" className="block px-4 py-2 hover:bg-gray-700">Registrar Jugador</Link>
-                <Link to="/listar-jugadores" className="block px-4 py-2 hover:bg-gray-700">Ver Jugadores</Link>
-              </div>
-            )}
-          </div>
-          
+
+          {/* Logout button for desktop */}
+          <button 
+            onClick={handleLogout}
+            className="ml-4 bg-red-600 hover:bg-red-700 px-3 py-2 rounded"
+          >
+            Cerrar Sesión
+          </button>
         </div>
         <div className="md:hidden">
           <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white focus:outline-none">
@@ -59,8 +63,11 @@ export default function NavbarAdmin() {
           </button>
         </div>
       </div>
+
+      {/* Mobile menu */}
       {isMenuOpen && (
         <div className="mt-2 md:hidden space-y-2">
+          {/* Partidos mobile menu */}
           <div>
             <button
               onClick={() => setIsPartidosMenuOpen(!isPartidosMenuOpen)}
@@ -70,28 +77,22 @@ export default function NavbarAdmin() {
             </button>
             {isPartidosMenuOpen && (
               <div className="pl-4 space-y-1">
-                <Link to="/crear-partido" className="block hover:text-gray-300">Crear Partido</Link>
+                <Link to="/homeAdmin" className="block hover:text-gray-300">Home</Link>
                 <Link to="/listar-partidos" className="block hover:text-gray-300">Ver Partidos</Link>
-                <Link to="/listar-partidos-por-estado" className="block hover:text-gray-300">Ver Partidos por Estado</Link>
+                <Link to="/admin-dashboard" className="block hover:text-gray-300">Dashboard</Link>
               </div>
             )}
           </div>
+
+          {/* Logout button for mobile */}
           <div>
-            <button
-              onClick={() => setIsJugadoresMenuOpen(!isJugadoresMenuOpen)}
-              className="block w-full text-left py-2 hover:text-gray-300"
+            <button 
+              onClick={handleLogout}
+              className="block w-full text-left py-2 hover:text-gray-300 bg-red-600 hover:bg-red-700 rounded"
             >
-              Jugadores
+              Cerrar Sesión
             </button>
-            {isJugadoresMenuOpen && (
-              <div className="pl-4 space-y-1">
-                <Link to="/registrar-jugador" className="block hover:text-gray-300">Registrar Jugador</Link>
-                <Link to="/listar-jugadores" className="block
-                 hover:text-gray-300">Ver Jugadores</Link>
-              </div>
-            )}
           </div>
-          
         </div>
       )}
     </nav>

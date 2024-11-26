@@ -3,9 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import CreatePartidoForm from '../components/CreatePartidoForm';
 
 // Componente Button simplificado
-const Button = ({ children, className, ...props }) => (
+const Button = ({ children, ...props }) => (
   <button
-    className={`px-4 py-2 rounded font-semibold ${className}`}
+    style={{
+      padding: '10px 20px',
+      borderRadius: '5px',
+      fontWeight: 'bold',
+      cursor: 'pointer',
+      width: '100%',
+    }}
     {...props}
   >
     {children}
@@ -13,38 +19,69 @@ const Button = ({ children, className, ...props }) => (
 );
 
 // Componente Card simplificado
-const Card = ({ children, className, ...props }) => (
-  <div className={`bg-white rounded-lg shadow-md ${className}`} {...props}>
+const Card = ({ children }) => (
+  <div
+    style={{
+      backgroundColor: 'white',
+      borderRadius: '10px',
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+      padding: '20px',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      height: '100%',
+    }}
+  >
     {children}
   </div>
 );
 
 export default function Home() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [mostrarCrearPartido, setMostrarCrearPartido] = useState(false);
   const navigate = useNavigate(); // Hook para navegar
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
-      <main className="flex-grow container mx-auto py-8 lg:px-12 md:px-6">
-        <h1 className="text-3xl font-bold text-center mb-8">Organizador de Partidos de Fútbol</h1>
-        <div className="grid md:grid-cols-2 gap-8">
-          <Card className="p-6">
-            <h2 className="text-2xl font-semibold mb-4">Crear Partido</h2>
-            <p className="mb-4">Organiza un nuevo partido de fútbol y gestiona los jugadores.</p>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#f3f3f3' }}>
+      <main style={{ flexGrow: 1, padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
+        <h1 style={{ textAlign: 'center', fontSize: '2rem', marginBottom: '20px' }}>Organizador de Partidos de Fútbol</h1>
+        <div
+          style={{
+            display: 'flex',
+            gap: '20px',
+            justifyContent: 'center',
+            alignItems: 'stretch',
+            height: '300px', // Altura uniforme para las tarjetas
+          }}
+        >
+          <Card>
+            <div>
+              <h2 style={{ fontSize: '1.5rem', marginBottom: '10px' }}>Crea y Administra Partidos</h2>
+              <p style={{ marginTop: '20px' }}>
+                En esta aplicación puedes crear nuevos partidos, gestionar 
+
+              </p>
+              <p>
+              sus detalles y también manejar a los creadores de partidos. 
+              </p>
+              <p>
+               Para ello debes iniciar sesión.
+              </p>
+            </div>
             <Button
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-              onClick={() => setMostrarCrearPartido(true)}
+              style={{ backgroundColor: '#007bff', color: 'white' }}
+              onClick={() => navigate('/login')}
             >
-              Crear Partido
+              Login
             </Button>
           </Card>
-          <Card className="p-6">
-            <h2 className="text-2xl font-semibold mb-4">Únete a un partido</h2>
-            <p className="mb-4">Únete a un partido existente y registra tu participación.</p>
+          <Card>
+            <div>
+              <h2 style={{ fontSize: '1.5rem', marginBottom: '10px' }}>Únete a un partido</h2>
+              <p style={{ marginBottom: '20px' }}>Únete a un partido existente y registra tu participación.</p>
+            </div>
             <Button
-              className="w-full bg-green-600 hover:bg-green-700 text-white"
-              onClick={() => navigate('/listar-partidos')} 
+              style={{ backgroundColor: '#28a745', color: 'white' }}
+              onClick={() => navigate('/listar-partidos-estado')}
             >
               Unirse a Partido
             </Button>
@@ -54,12 +91,26 @@ export default function Home() {
 
       {mostrarCrearPartido && (
         <div
-          className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75"
-          onClick={() => setMostrarCrearPartido(false)} // Cerrar el modal al hacer clic fuera
+          style={{
+            position: 'fixed',
+            inset: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+          }}
+          onClick={() => setMostrarCrearPartido(false)}
         >
           <div
-            className="bg-white rounded-lg p-8 shadow-lg w-full max-w-md"
-            onClick={(e) => e.stopPropagation()} // Evita que el clic en el formulario cierre el modal
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '10px',
+              padding: '20px',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+              width: '100%',
+              maxWidth: '500px',
+            }}
+            onClick={(e) => e.stopPropagation()}
           >
             <CreatePartidoForm onClose={() => setMostrarCrearPartido(false)} />
           </div>

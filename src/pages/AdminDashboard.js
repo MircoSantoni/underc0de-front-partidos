@@ -25,15 +25,6 @@ function AdminDashboard() {
 
   const token = Cookies.get('authToken');
 
-
-  // Configure axios headers for all requests
-  const axiosConfig = {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
-  };
-
   useEffect(() => {
     cargarAdmins();
   }, []);
@@ -147,10 +138,7 @@ function AdminDashboard() {
     }
   };
 
-  const handleLogout = () => {
-    Cookies.remove('authToken');
-    window.location.href = '/login';
-  };
+
 
   return (
     <div className="admin-dashboard container mx-auto p-4">
@@ -340,13 +328,7 @@ function AdminDashboard() {
           </tbody>
         </table>
       </div>
-
-      <div className="mt-4">
-        <Button variant="danger" onClick={handleLogout}>
-          Cerrar Sesión
-        </Button>
-      </div>
-
+      
       <Modal
         isOpen={isModalOpen}
         onClose={() => {
